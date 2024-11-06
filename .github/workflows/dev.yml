@@ -1,3 +1,4 @@
+
 name: Development Workflow
 
 on:
@@ -15,8 +16,7 @@ jobs:
     services:
       subscribe-database:
         image: mongo
-        # ports:
-        #  - 27017:27017
+        # No ports are mapped to avoid conflicts
 
     steps:
       - name: Checkout code
@@ -30,26 +30,33 @@ jobs:
       - name: Setup Environment Variables
         run: |
           echo "REACT_APP_API_URL=http://localhost:3000" >> $GITHUB_ENV
-          echo "DATABASE_URL=mongodb://localhost:27017/ThaZoneDev" >> $GITHUB_ENV
-
-      # Note: No need to install Docker Compose separately
+          echo "DATABASE_URL=mongodb://subscribe-database:27017/ThaZoneDev" >> $GITHUB_ENV
 
       - name: Build and Run Docker Compose for Dev
-        run: docker compose -f docker-compose.yml -f docker-compose.dev.yml -f docker-compose.override.yml up --build -d
+        run: docker compose -f docker-compose.yml -f docker-compose.dev.yml up --build -d
 
-      # Add a step to ensure MongoDB is ready before running tests
+      # Improved MongoDB readiness check with timeout and log capture
       - name: Wait for MongoDB to be ready
         run: |
+          ATTEMPTS=0
+          MAX_ATTEMPTS=30
           until docker compose exec subscribe-database mongo --eval "print('MongoDB is ready')" &> /dev/null
           do
+            if [ $ATTEMPTS -ge $MAX_ATTEMPTS ]; then
+              echo "MongoDB failed to start within expected time."
+              echo "Capturing MongoDB logs for debugging:"
+              docker compose logs subscribe-database
+              exit 1
+            fi
             echo "Waiting for MongoDB to start..."
+            ATTEMPTS=$((ATTEMPTS + 1))
             sleep 5
-          done 
+          done
 
       - name: Run Backend Tests
         run: docker compose exec subscribe-backend npm test
 
-      # Collect logs for debugging if there is a failure
+      # Capture logs for debugging if there is a failure
       - name: Capture Logs for Debugging
         if: failure()
         run: |
