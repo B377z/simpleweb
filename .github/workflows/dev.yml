@@ -29,7 +29,7 @@ jobs:
       - name: Setup Environment Variables
         run: |
           echo "REACT_APP_API_URL=http://localhost:3000" >> $GITHUB_ENV
-          echo "DATABASE_URL=mongodb://subscribe-database:27017/ThaZoneDev" >> $GITHUB_ENV
+          echo "DATABASE_URL=mongodb://172.18.0.2:27017/ThaZoneDev" >> $GITHUB_ENV
 
       - name: Build and Run Docker Compose for Dev
         run: docker compose -f docker-compose.yml -f docker-compose.dev.yml up --build -d
