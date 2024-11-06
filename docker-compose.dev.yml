@@ -4,13 +4,14 @@ services:
     volumes:
       - mongo-data:/data/db
     networks:
-      - mongo-network
+      - default  # Use the default network
+
     healthcheck:
       test: ["CMD", "mongo", "--eval", "db.adminCommand('ping')"]
       interval: 10s
       timeout: 5s
       retries: 3
-      start_period: 60s  # Adjust this period as needed
+      start_period: 60s
     sysctls:
       net.core.somaxconn: 1024
       fs.file-max: 65535
@@ -21,7 +22,7 @@ services:
       context: ./backend
     environment:
       - NODE_ENV=development
-      - DATABASE_URL=mongodb://172.18.0.2:27017/ThaZoneDev  # Use the IP if needed
+      - DATABASE_URL=mongodb://172.18.0.2:27017/ThaZoneDev  # Use the existing IP
     ports:
       - "3000:3000"
     volumes:
@@ -30,7 +31,7 @@ services:
     depends_on:
       - subscribe-database
     networks:
-      - mongo-network
+      - default
 
   subscribe-frontend:
     build:
@@ -44,14 +45,12 @@ services:
     depends_on:
       - subscribe-backend
     networks:
-      - mongo-network
+      - default
 
 volumes:
   mongo-data:
 
 networks:
-  mongo-network:
-    driver: bridge
-    ipam:
-      config:
-        - subnet: 172.18.0.0/16
+  default:
+    external:
+      name: simpleweb_default
