@@ -26,7 +26,12 @@ jobs:
           node-version: '18'
 
       - name: Install Dependencies
-        run: npm install
+        run: |
+          cd backend
+          npm ci
+
+      - name: Install Jest Globally
+        run: npm install -g jest
 
       - name: Run Tests
         run: |
