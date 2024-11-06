@@ -14,7 +14,6 @@ jobs:
       subscribe-database:
         image: mongo
         options: >-
-          --network simpleweb_default
           --network-alias subscribe-database
 
     steps:
@@ -30,9 +29,6 @@ jobs:
         run: |
           echo "REACT_APP_API_URL=http://localhost:3000" >> $GITHUB_ENV
           echo "DATABASE_URL=mongodb://subscribe-database:27017/ThaZoneDev" >> $GITHUB_ENV
-
-      - name: Create Docker Network
-        run: docker network create simpleweb_default || true
 
       - name: Build and Run Docker Compose for Dev
         run: docker compose -f docker-compose.yml -f docker-compose.dev.yml up --build -d

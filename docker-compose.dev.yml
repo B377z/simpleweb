@@ -51,6 +51,6 @@ volumes:
   mongo-data:
 
 networks:
-  default:
-    external:
-      name: simpleweb_default
+  simpleweb_default:
+    external: true
+
