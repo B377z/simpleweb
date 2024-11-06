@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+  subscribe-database:
+    image: mongo
+    ports:
+      - "27017:27017"
+
+  subscribe-backend:
+    build:
+      context: ./backend
+    environment:
+      - DATABASE_URL=mongodb://subscribe-database:27017/ThaZone
+    ports:
+      - "3000:3000"
+    depends_on:
+      - subscribe-database
+
+  subscribe-frontend:
+    build:
+      context: ./client
+      args:
+        - REACT_APP_BACKEND_URL=http://localhost:3000
+    ports:
+      - "3001:80"
+    depends_on:
+      - subscribe-backend
