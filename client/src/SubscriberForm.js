@@ -6,10 +6,13 @@ const SubscriberForm = () => {
     const [email, setEmail] = useState('');
     const [message, setMessage] = useState('');
 
+    // Use the environment variable for the API base URL
+    const apiUrl = process.env.REACT_APP_API_URL;
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const response = await axios.post('http://localhost:3000/api/subscribe', { email });
+            const response = await axios.post(`${apiUrl}/api/subscribe`, { email });
             setMessage(response.data.message);
             setEmail(''); // Clear the email field after success
         } catch (error) {

@@ -1,0 +1,46 @@
+name: Development Workflow
+
+on:
+  push:
+    branches:
+      - dev
+  pull_request:
+    branches:
+      - dev
+
+jobs:
+  test-development:
+    runs-on: ubuntu-latest
+
+    services:
+      subscribe-database:
+        image: mongo
+        ports:
+          - 27017:27017
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '14'
+
+      - name: Set up Environment Variables
+        run: |
+          echo "REACT_APP_API_URL=http://localhost:3000" >> $GITHUB_ENV
+          echo "DATABASE_URL=mongodb://localhost:27017/ThaZoneDev" >> $GITHUB_ENV
+
+      - name: Build and Run Docker Compose for Dev
+        run: docker-compose -f docker-compose.yml -f docker-compose.dev.yml up --build -d
+
+      - name: Wait for Services to Start
+        run: sleep 20
+
+      - name: Run Backend Tests
+        run: docker-compose exec subscribe-backend npm test
+
+      - name: Tear Down Docker Compose
+        if: always()
+        run: docker-compose -f docker-compose.yml -f docker-compose.dev.yml down

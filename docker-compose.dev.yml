@@ -3,14 +3,20 @@ services:
     image: mongo
     ports:
       - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
 
   subscribe-backend:
     build:
       context: ./backend
     environment:
-      - DATABASE_URL=mongodb://subscribe-database:27017/ThaZone
+      - NODE_ENV=development
+      - DATABASE_URL=mongodb://subscribe-database:27017/ThaZoneDev
     ports:
       - "3000:3000"
+    volumes:
+      - ./backend:/app
+    command: npm run dev
     depends_on:
       - subscribe-database
 
@@ -18,8 +24,13 @@ services:
     build:
       context: ./client
       args:
-        - REACT_APP_BACKEND_URL=http://localhost:3000
+        - REACT_APP_API_URL=http://subscribe-backend:3000
     ports:
       - "3001:80"
+    volumes:
+      - ./client:/app
     depends_on:
       - subscribe-backend
+
+volumes:
+  mongo-data:
