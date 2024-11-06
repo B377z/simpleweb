@@ -49,16 +49,7 @@ jobs:
           REACT_APP_API_URL: http://localhost:3000
           DATABASE_URL: mongodb://subscribe-database:27017/ThaZoneDev
 
-      - name: Wait for MongoDB to be ready
-        run: |
-          for i in {1..30}; do
-            if docker compose exec subscribe-database mongo --eval "print('MongoDB is ready')" &>/dev/null; then
-              echo "MongoDB is ready"
-              break
-            fi
-            echo "Waiting for MongoDB to start..."
-            sleep 5
-          done
+      
 
       - name: Run Backend Tests
         run: docker compose exec subscribe-backend npm test
