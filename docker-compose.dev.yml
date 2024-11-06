@@ -15,14 +15,13 @@ services:
       net.core.somaxconn: 1024
       fs.file-max: 65535
       vm.swappiness: 1
-    
 
   subscribe-backend:
     build:
       context: ./backend
     environment:
       - NODE_ENV=development
-      - DATABASE_URL=mongodb://subscribe-database:27017/ThaZoneDev
+      - DATABASE_URL=mongodb://172.18.0.2:27017/ThaZoneDev  # Use the IP if needed
     ports:
       - "3000:3000"
     volumes:
@@ -30,6 +29,8 @@ services:
     command: npm run dev
     depends_on:
       - subscribe-database
+    networks:
+      - mongo-network
 
   subscribe-frontend:
     build:
@@ -42,6 +43,15 @@ services:
       - ./client:/app
     depends_on:
       - subscribe-backend
+    networks:
+      - mongo-network
 
 volumes:
   mongo-data:
+
+networks:
+  mongo-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.18.0.0/16
