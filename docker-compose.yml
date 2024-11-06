@@ -6,7 +6,7 @@ services:
     build:
       context: ./backend
     environment:
-      - DATABASE_URL=mongodb://subscribe-database:27017/ThaZone
+      - DATABASE_URL=mongodb://subscribe-database:27017/ThaZoneDev
     ports:
       - "3000:3000"
     depends_on:
