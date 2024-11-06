@@ -16,7 +16,8 @@ jobs:
     services:
       subscribe-database:
         image: mongo
-        # No ports are mapped to avoid conflicts
+        ports:
+          - "27017:27017"
 
     steps:
       - name: Checkout code
