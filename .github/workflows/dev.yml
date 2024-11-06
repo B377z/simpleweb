@@ -15,7 +15,7 @@ jobs:
         image: mongo
         options: >-
           --network simpleweb_default
-          --ip 172.18.0.2
+          --network-alias subscribe-database
 
     steps:
       - name: Checkout code
@@ -29,16 +29,16 @@ jobs:
       - name: Setup Environment Variables
         run: |
           echo "REACT_APP_API_URL=http://localhost:3000" >> $GITHUB_ENV
-          echo "DATABASE_URL=mongodb://172.18.0.2:27017/ThaZoneDev" >> $GITHUB_ENV
+          echo "DATABASE_URL=mongodb://subscribe-database:27017/ThaZoneDev" >> $GITHUB_ENV
 
       - name: Create Docker Network
-        run: docker network create --driver bridge --subnet 172.18.0.0/16 simpleweb_default || true
+        run: docker network create simpleweb_default || true
 
       - name: Build and Run Docker Compose for Dev
         run: docker compose -f docker-compose.yml -f docker-compose.dev.yml up --build -d
         env:
           REACT_APP_API_URL: http://localhost:3000
-          DATABASE_URL: mongodb://172.18.0.2:27017/ThaZoneDev
+          DATABASE_URL: mongodb://subscribe-database:27017/ThaZoneDev
 
       - name: Wait for MongoDB to be ready
         run: |
@@ -65,5 +65,3 @@ jobs:
       - name: Tear Down Docker Compose
         if: always()
         run: docker compose -f docker-compose.yml -f docker-compose.dev.yml down
-
-
