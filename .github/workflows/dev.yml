@@ -1,6 +1,3 @@
-
-name: Development Workflow
-
 on:
   push:
     branches:
@@ -16,6 +13,9 @@ jobs:
     services:
       subscribe-database:
         image: mongo
+        options: >-
+          --network simpleweb_default
+          --ip 172.18.0.2
 
     steps:
       - name: Checkout code
@@ -24,38 +24,36 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '14'
+          node-version: '18'
 
       - name: Setup Environment Variables
         run: |
           echo "REACT_APP_API_URL=http://localhost:3000" >> $GITHUB_ENV
           echo "DATABASE_URL=mongodb://172.18.0.2:27017/ThaZoneDev" >> $GITHUB_ENV
 
+      - name: Create Docker Network
+        run: docker network create --driver bridge --subnet 172.18.0.0/16 simpleweb_default || true
+
       - name: Build and Run Docker Compose for Dev
         run: docker compose -f docker-compose.yml -f docker-compose.dev.yml up --build -d
+        env:
+          REACT_APP_API_URL: http://localhost:3000
+          DATABASE_URL: mongodb://172.18.0.2:27017/ThaZoneDev
 
-      # Improved MongoDB readiness check with timeout and log capture
       - name: Wait for MongoDB to be ready
         run: |
-          ATTEMPTS=0
-          MAX_ATTEMPTS=30
-          until docker compose exec subscribe-database mongo --eval "print('MongoDB is ready')" &> /dev/null
-          do
-            if [ $ATTEMPTS -ge $MAX_ATTEMPTS ]; then
-              echo "MongoDB failed to start within expected time."
-              echo "Capturing MongoDB logs for debugging:"
-              docker compose logs subscribe-database
-              exit 1
+          for i in {1..30}; do
+            if docker compose exec subscribe-database mongo --eval "print('MongoDB is ready')" &>/dev/null; then
+              echo "MongoDB is ready"
+              break
             fi
             echo "Waiting for MongoDB to start..."
-            ATTEMPTS=$((ATTEMPTS + 1))
             sleep 5
           done
 
       - name: Run Backend Tests
         run: docker compose exec subscribe-backend npm test
 
-      # Capture logs for debugging if there is a failure
       - name: Capture Logs for Debugging
         if: failure()
         run: |
@@ -67,3 +65,5 @@ jobs:
       - name: Tear Down Docker Compose
         if: always()
         run: docker compose -f docker-compose.yml -f docker-compose.dev.yml down
+
+
