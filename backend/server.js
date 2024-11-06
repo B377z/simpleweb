@@ -39,6 +39,15 @@ app.post('/api/subscribe', async (req, res) => {
     }
 });
 
+app.get('/api/subscribers', async (req, res) => {
+    try {
+        const subscribers = await Subscriber.find(); // Fetches all subscribers
+        res.status(200).json(subscribers);
+    } catch (err) {
+        res.status(500).json({ message: 'Server error' });
+    }
+});
+
 // Start the server
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);

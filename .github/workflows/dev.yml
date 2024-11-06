@@ -49,8 +49,6 @@ jobs:
           REACT_APP_API_URL: http://localhost:3000
           DATABASE_URL: mongodb://subscribe-database:27017/ThaZoneDev
 
-      
-
       - name: Run Backend Tests
         run: docker compose exec subscribe-backend npm test
 
