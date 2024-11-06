@@ -23,3 +23,6 @@ services:
       - "3001:80"
     depends_on:
       - subscribe-backend
+
+volumes:
+  mongo-data:
