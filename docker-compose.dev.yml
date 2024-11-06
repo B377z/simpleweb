@@ -5,13 +5,12 @@ services:
       - mongo-data:/data/db
     ports:
       - "27017:27017"
-      
+
     healthcheck:
-      test: ["CMD", "mongo", "--eval", "db.adminCommand('ping')"]
+      test: ["CMD-SHELL", "pgrep mongod || exit 1"]
       interval: 10s
       timeout: 5s
-      retries: 5
-      start_period: 5s
+      retries: 10
 
   subscribe-backend:
     build:
