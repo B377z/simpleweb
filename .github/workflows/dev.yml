@@ -37,12 +37,26 @@ jobs:
       - name: Build and Run Docker Compose for Dev
         run: docker compose -f docker-compose.yml -f docker-compose.dev.yml -f docker-compose.override.yml up --build -d
 
-
-      - name: Wait for Services to Start
-        run: sleep 20
+      # Add a step to ensure MongoDB is ready before running tests
+      - name: Wait for MongoDB to be ready
+        run: |
+          until docker compose exec subscribe-database mongo --eval "print('MongoDB is ready')" &> /dev/null
+          do
+            echo "Waiting for MongoDB to start..."
+            sleep 5
+          done 
 
       - name: Run Backend Tests
         run: docker compose exec subscribe-backend npm test
+
+      # Collect logs for debugging if there is a failure
+      - name: Capture Logs for Debugging
+        if: failure()
+        run: |
+          echo "Backend logs:"
+          docker compose logs subscribe-backend
+          echo "Database logs:"
+          docker compose logs subscribe-database
 
       - name: Tear Down Docker Compose
         if: always()
