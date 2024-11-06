@@ -25,6 +25,12 @@ jobs:
         with:
           node-version: '18'
 
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Run Tests
+        run: npm test
+
       - name: Setup Environment Variables
         run: |
           echo "REACT_APP_API_URL=http://localhost:3000" >> $GITHUB_ENV
