@@ -8,7 +8,7 @@ services:
     build:
       context: ./backend
     environment:
-      - DATABASE_URL=mongodb://subscribe-database:27017/ThaZoneDev
+      - DATABASE_URL=mongodb://172.18.0.2:27017/ThaZoneDev
     ports:
       - "3000:3000"
     depends_on:
@@ -18,7 +18,7 @@ services:
     build:
       context: ./client
       args:
-        - REACT_APP_BACKEND_URL=http://subscribe-backend:3000
+        - REACT_APP_BACKEND_URL=http://localhost:3000
     ports:
       - "3001:80"
     depends_on:

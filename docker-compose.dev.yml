@@ -3,14 +3,19 @@ services:
     image: mongo
     volumes:
       - mongo-data:/data/db
-    ports:
-      - "27017:27017"
-
+    networks:
+      - mongo-network
     healthcheck:
-      test: ["CMD-SHELL", "pgrep mongod || exit 1"]
+      test: ["CMD", "mongo", "--eval", "db.adminCommand('ping')"]
       interval: 10s
       timeout: 5s
-      retries: 10
+      retries: 3
+      start_period: 60s  # Adjust this period as needed
+    sysctls:
+      net.core.somaxconn: 1024
+      fs.file-max: 65535
+      vm.swappiness: 1
+    
 
   subscribe-backend:
     build:
