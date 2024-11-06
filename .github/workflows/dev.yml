@@ -17,7 +17,7 @@ jobs:
         image: mongo
         ports:
           - 27017:27017
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -27,26 +27,22 @@ jobs:
         with:
           node-version: '14'
 
-      - name: Set up Environment Variables
+      - name: Setup Environment Variables
         run: |
           echo "REACT_APP_API_URL=http://localhost:3000" >> $GITHUB_ENV
           echo "DATABASE_URL=mongodb://localhost:27017/ThaZoneDev" >> $GITHUB_ENV
 
-      - name: Install Docker Compose
-        run: |
-            DOCKER_COMPOSE_VERSION=1.29.2
-            sudo curl -L "https://github.com/docker/compose/releases/download/${DOCKER_COMPOSE_VERSION}/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-            sudo chmod +x /usr/local/bin/docker-compose
+      # Note: No need to install Docker Compose separately
 
       - name: Build and Run Docker Compose for Dev
-        run: docker-compose -f docker-compose.yml -f docker-compose.dev.yml up --build -d
+        run: docker compose -f docker-compose.yml -f docker-compose.dev.yml up --build -d
 
       - name: Wait for Services to Start
         run: sleep 20
 
       - name: Run Backend Tests
-        run: docker-compose exec subscribe-backend npm test
+        run: docker compose exec subscribe-backend npm test
 
       - name: Tear Down Docker Compose
         if: always()
-        run: docker-compose -f docker-compose.yml -f docker-compose.dev.yml down
+        run: docker compose -f docker-compose.yml -f docker-compose.dev.yml down
