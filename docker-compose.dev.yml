@@ -3,22 +3,17 @@ services:
     image: mongo
     volumes:
       - mongo-data:/data/db
+    ports:
+      - "27017:27017"
     networks:
       - default  # Use the default network
-
-    healthcheck:
-      test: ["CMD", "mongo", "--eval", "db.adminCommand('ping')"]
-      interval: 10s
-      timeout: 5s
-      retries: 3
-      start_period: 60s
 
   subscribe-backend:
     build:
       context: ./backend
     environment:
       - NODE_ENV=development
-      - DATABASE_URL=mongodb://172.18.0.2:27017/ThaZoneDev  # Use the existing IP
+      - DATABASE_URL=mongodb://subscribe-database:27017/ThaZoneDev  # Use the existing IP
     ports:
       - "3000:3000"
     volumes:
