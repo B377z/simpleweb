@@ -15,8 +15,8 @@ jobs:
     services:
       subscribe-database:
         image: mongo
-        ports:
-          - 27017:27017
+        # ports:
+        #  - 27017:27017
 
     steps:
       - name: Checkout code
