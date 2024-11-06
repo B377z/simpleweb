@@ -1,6 +1,8 @@
 services:
   subscribe-database:
     image: mongo
+    volumes:
+      - mongo-data:/data/db
 
   subscribe-backend:
     build:
