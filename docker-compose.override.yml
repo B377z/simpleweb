@@ -1,0 +1,4 @@
+# docker-compose.override.yml
+services:
+  subscribe-database:
+    ports: []  # Empty ports array removes host binding in GitHub Actions

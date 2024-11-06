@@ -35,7 +35,8 @@ jobs:
       # Note: No need to install Docker Compose separately
 
       - name: Build and Run Docker Compose for Dev
-        run: docker compose -f docker-compose.yml -f docker-compose.dev.yml up --build -d
+        run: docker compose -f docker-compose.yml -f docker-compose.dev.yml -f docker-compose.override.yml up --build -d
+
 
       - name: Wait for Services to Start
         run: sleep 20
