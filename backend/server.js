@@ -27,7 +27,10 @@ const Subscriber = mongoose.model('Subscriber', subscriberSchema);
 app.post('/api/subscribe', async (req, res) => {
     const { email } = req.body;
     try {
-        const newSubscriber = new Subscriber({ email });
+        const newSubscriber = new Subscriber({ 
+            email,
+            subscriptionDate: new Date()
+        });
         await newSubscriber.save();
         res.status(201).json({ message: 'Subscribed successfully!' });
     } catch (err) {
@@ -40,8 +43,19 @@ app.post('/api/subscribe', async (req, res) => {
 });
 
 app.get('/api/subscribers', async (req, res) => {
+    const { startDate, endDate } = req.query;
+    const query = {};
+
+    // If startDate and endDate are provided, filter by subscription date
+    if (startDate && endDate) {
+        query.subscriptionDate = {
+            $gte: new Date(startDate),
+            $lte: new Date(endDate),
+        };
+    }
+
     try {
-        const subscribers = await Subscriber.find(); // Fetches all subscribers
+        const subscribers = await Subscriber.find(query); // Fetches all subscribers
         res.status(200).json(subscribers);
     } catch (err) {
         res.status(500).json({ message: 'Server error' });
