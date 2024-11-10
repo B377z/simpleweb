@@ -10,7 +10,7 @@ services:
     build:
       context: ./backend
     environment:
-      - DATABASE_URL=mongodb://172.18.0.2:27017/ThaZoneDev
+      - DATABASE_URL=mongodb://subscribe-database:27017/ThaZoneDev  # Use service name instead of IP
     ports:
       - "3000:3000"
     depends_on:
